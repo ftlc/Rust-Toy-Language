@@ -1,7 +1,9 @@
 extern crate sexp; 
 mod parser;
-mod types;
-use types::{ExprS, Value};
+pub mod types;
+use types::ExprS;
+use types::Value;
+
 // type Definitions
 // #[derive(Debug, PartialEq)]
 // pub enum Value {

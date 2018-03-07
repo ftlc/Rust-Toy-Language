@@ -1,5 +1,5 @@
 extern crate pl;
-use pl::{Value, ExprS};
+use pl::types::{Value, ExprS};
 
 #[test]
 fn calls_run() {
