@@ -4,41 +4,21 @@ pub mod types;
 use types::ExprS;
 use types::Value;
 
-// type Definitions
-// #[derive(Debug, PartialEq)]
-// pub enum Value {
-    // BoolV (bool),
-    // NumV (i32),
-    // _BoxV (i32),
-// }
 
 enum ExprC {
     BoolC (bool),
     NumC (i32),
+    IdC (String),
     PlusC {l: Box<ExprC>, r: Box<ExprC>},
     MultC {l: Box<ExprC>, r: Box<ExprC>},
-    
 }
 
-// pub enum ExprS {
-    // BoolS (bool),
-    // NumS (i32),
-    // PlusS {l: Box<ExprS>, r: Box<ExprS>},
-    // MultS {l: Box<ExprS>, r: Box<ExprS>}, 
-    // MinusS {l: Box<ExprS>, r: Box<ExprS>}, 
-// }
-
-// fn parse(_s : &str) -> ExprS {
-    // ExprS::PlusS {
-        // l : Box::new(ExprS::NumS(8)),
-        // r : Box::new(ExprS::NumS(7)),
-    // }
-// }
 
 fn desugar(expr_s : ExprS ) ->ExprC {
     match expr_s {
         ExprS::NumS(n) => ExprC::NumC(n),
         ExprS::BoolS(b) => ExprC::BoolC(b),
+        ExprS::IdS(s) => ExprC::IdC(s),
         ExprS::PlusS { l, r } => {
             let l_c = desugar(*l);
             let r_c = desugar(*r);
@@ -76,7 +56,8 @@ fn interp(expr_c : ExprC) -> Value {
             let l_n = interp(*l);
             let r_n = interp(*r);
             return num_mult(l_n, r_n);
-        }
+        },
+        _ => panic!("Not implemented")
     }
 }
 
@@ -116,13 +97,3 @@ pub fn run_pre_parser(expr_s : ExprS) -> Value {
 }
 
 
-
-// impl fmt::Display for Value {
-    // fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        // match *self {
-            // Value::NumV(n) => write!(f, "{}", n),
-            // Value::BoolV(b) => write!(f, "{}", b),
-            // Value::_BoxV(l) => write!(f, "{}", l),
-        // }
-    // }
-// }

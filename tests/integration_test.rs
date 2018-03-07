@@ -2,8 +2,13 @@ extern crate pl;
 use pl::types::{Value, ExprS};
 
 #[test]
-fn calls_run() {
-    assert_eq!(Value::NumV(15), pl::run("Test"));
+fn tests_num() {
+    assert_eq!(Value::NumV(15), pl::run("15"));
+}
+
+#[test]
+fn tests_bool() {
+    assert_eq!(Value::BoolV(true), pl::run("true"));
 }
 
 #[test]

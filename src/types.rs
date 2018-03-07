@@ -10,6 +10,7 @@ pub enum Value {
 pub enum ExprS {
     BoolS (bool),
     NumS (i32),
+    IdS (String),
     PlusS {l: Box<ExprS>, r: Box<ExprS>},
     MultS {l: Box<ExprS>, r: Box<ExprS>}, 
     MinusS {l: Box<ExprS>, r: Box<ExprS>}, 
