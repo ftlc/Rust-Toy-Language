@@ -1,13 +1,14 @@
 extern crate sexp; 
-use std::fmt;
-
+mod parser;
+mod types;
+use types::{ExprS, Value};
 // type Definitions
-#[derive(Debug, PartialEq)]
-pub enum Value {
-    BoolV (bool),
-    NumV (i32),
-    _BoxV (i32),
-}
+// #[derive(Debug, PartialEq)]
+// pub enum Value {
+    // BoolV (bool),
+    // NumV (i32),
+    // _BoxV (i32),
+// }
 
 enum ExprC {
     BoolC (bool),
@@ -17,20 +18,20 @@ enum ExprC {
     
 }
 
-pub enum ExprS {
-    BoolS (bool),
-    NumS (i32),
-    PlusS {l: Box<ExprS>, r: Box<ExprS>},
-    MultS {l: Box<ExprS>, r: Box<ExprS>}, 
-    MinusS {l: Box<ExprS>, r: Box<ExprS>}, 
-}
+// pub enum ExprS {
+    // BoolS (bool),
+    // NumS (i32),
+    // PlusS {l: Box<ExprS>, r: Box<ExprS>},
+    // MultS {l: Box<ExprS>, r: Box<ExprS>}, 
+    // MinusS {l: Box<ExprS>, r: Box<ExprS>}, 
+// }
 
-fn parse(_s : &str) -> ExprS {
-    ExprS::PlusS {
-        l : Box::new(ExprS::NumS(8)),
-        r : Box::new(ExprS::NumS(7)),
-    }
-}
+// fn parse(_s : &str) -> ExprS {
+    // ExprS::PlusS {
+        // l : Box::new(ExprS::NumS(8)),
+        // r : Box::new(ExprS::NumS(7)),
+    // }
+// }
 
 fn desugar(expr_s : ExprS ) ->ExprC {
     match expr_s {
@@ -105,7 +106,7 @@ fn num_mult(l : Value, r : Value) -> Value {
 }
 
 pub fn run(s : &str) -> Value {
-    interp(desugar(parse( s )))
+    interp(desugar(parser::parse( s )))
 }
 
 pub fn run_pre_parser(expr_s : ExprS) -> Value {
@@ -114,12 +115,12 @@ pub fn run_pre_parser(expr_s : ExprS) -> Value {
 
 
 
-impl fmt::Display for Value {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            Value::NumV(n) => write!(f, "{}", n),
-            Value::BoolV(b) => write!(f, "{}", b),
-            Value::_BoxV(l) => write!(f, "{}", l),
-        }
-    }
-}
+// impl fmt::Display for Value {
+    // fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        // match *self {
+            // Value::NumV(n) => write!(f, "{}", n),
+            // Value::BoolV(b) => write!(f, "{}", b),
+            // Value::_BoxV(l) => write!(f, "{}", l),
+        // }
+    // }
+// }
