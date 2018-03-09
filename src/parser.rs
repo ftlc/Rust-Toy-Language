@@ -35,6 +35,13 @@ fn is_bool(s: &str) -> Option<bool> {
     }
 }
 
+fn third<T>(v : &Vec<T>) -> &T {
+    &((&v)[2])
+}
+fn second<T>(v : &Vec<T>) -> &T {
+    &((&v)[1])
+}
+
 fn parse_sexp(sexp : &Sexp) -> ExprS {
     match *sexp {
         Sexp::Num(n) => ExprS::NumS(n),
@@ -45,30 +52,18 @@ fn parse_sexp(sexp : &Sexp) -> ExprS {
             match *first {
                 Sexp::Sym(ref s) => {
                     match s.as_ref() {
-                        "+" => {
-                            let second = &list[1];
-                            let third = &list[2];
-                            ExprS::PlusS{
-                                l : Box::new(parse_sexp(second)),
-                                r : Box::new(parse_sexp(third))
-                            }
-                        }
-                        "*" => {
-                            let second = &list[1];
-                            let third = &list[2];
-                            ExprS::MultS{
-                                l : Box::new(parse_sexp(second)),
-                                r : Box::new(parse_sexp(third))
-                            }
-                        }
-                        "-" => {
-                            let second = &list[1];
-                            let third = &list[2];
-                            ExprS::MinusS{
-                                l : Box::new(parse_sexp(second)),
-                                r : Box::new(parse_sexp(third))
-                            }
-                        }
+                        "+" => ExprS::PlusS{
+                            l : Box::new(parse_sexp(second(list))),
+                            r : Box::new(parse_sexp(third(list)))
+                        },
+                        "*" => ExprS::MultS{
+                            l : Box::new(parse_sexp(second(list))),
+                            r : Box::new(parse_sexp(third(list)))
+                        },
+                        "-" => ExprS::MinusS{
+                            l : Box::new(parse_sexp(second(list))),
+                            r : Box::new(parse_sexp(third(list)))
+                        },
 
                         _ => panic!("Not implemented yet")
                     }
