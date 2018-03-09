@@ -42,13 +42,13 @@ fn parse_sexp(sexp : Sexp) -> ExprS {
         Sexp::Sym(s) => ExprS::IdS(s),
         Sexp::List(v) => {
             let mut list = *v;
-            let first = list.remove(0);
+            let first = list.remove(0); //Gross
             match first {
                 Sexp::Sym(s) => {
                     match s.as_ref() {
                         "+" => {
-                            let second = list.remove(0);
-                            let third = list.remove(0);
+                            let second = list.remove(0); 
+                            let third = list.remove(0); //Grosser
                             ExprS::PlusS{
                                 l : Box::new(parse_sexp(second)),
                                 r : Box::new(parse_sexp(third))
