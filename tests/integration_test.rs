@@ -1,5 +1,5 @@
 extern crate pl;
-use pl::types::{Value, ExprS};
+use pl::types::Value;
 
 #[test]
 fn tests_num() {
@@ -12,24 +12,17 @@ fn tests_bool() {
 }
 
 #[test]
-fn tests_mult() {
-    assert_eq!(
-        Value::NumV(10), 
-        pl::run_pre_parser(
-            ExprS::MultS {
-                l : Box::new(ExprS::NumS(5)),
-                r : Box::new(ExprS::NumS(2)),
-            }))
+fn tests_plus() {
+    assert_eq!(Value::NumV(15), pl::run("(+ (+ 8 2) 5)"));
 }
-
 
 #[test]
-fn tests_plus() {
-    assert_eq!(
-        Value::NumV(7), 
-        pl::run_pre_parser(
-            ExprS::PlusS {
-                l : Box::new(ExprS::NumS(5)),
-                r : Box::new(ExprS::NumS(2)),
-            }))
+fn tests_mult() {
+    assert_eq!(Value::NumV(50), pl::run("(* (+ 8 2) 5)"));
 }
+
+#[test]
+fn tests_minus() {
+    assert_eq!(Value::NumV(5), pl::run("(- (+ 8 2) 5)"));
+}
+

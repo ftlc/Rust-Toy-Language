@@ -1,12 +1,25 @@
+use std::fmt;
 use types::ExprS;
 // use std::borrow::ToOwned;
 
-pub fn parse(s : &str) -> ExprS {
-   
-    let tokens = tokenize(s);
-    println!("Vector: {:?}", tokens);
-    build_exp(tokens)
+
+#[derive(Debug, PartialEq)]
+enum Sexp {
+    Bool (bool),
+    Num (i32),
+    Sym (String),
+    List (Box<Vec<Sexp>>)
 }
+
+pub fn parse(s : &str) -> ExprS {
+    let mut tokens = tokenize(s);
+    println!("Vector: {:?}", tokens);
+    let s : Sexp = build_sexp(&mut tokens);
+    println!("SEXPL {}", s);
+
+    parse_sexp(s)
+}
+
 
 fn is_number(s: &str) -> Option<i32> {
     match s.parse::<i32>() {
@@ -22,8 +35,51 @@ fn is_bool(s: &str) -> Option<bool> {
     }
 }
 
-fn build_exp(mut tokens : Vec<String>) -> ExprS {
+fn parse_sexp(sexp : Sexp) -> ExprS {
+    match sexp {
+        Sexp::Num(n) => ExprS::NumS(n),
+        Sexp::Bool(b) => ExprS::BoolS(b),
+        Sexp::Sym(s) => ExprS::IdS(s),
+        Sexp::List(v) => {
+            let mut list = *v;
+            let first = list.remove(0);
+            match first {
+                Sexp::Sym(s) => {
+                    match s.as_ref() {
+                        "+" => {
+                            let second = list.remove(0);
+                            let third = list.remove(0);
+                            ExprS::PlusS{
+                                l : Box::new(parse_sexp(second)),
+                                r : Box::new(parse_sexp(third))
+                            }
+                        }
+                        "*" => {
+                            let second = list.remove(0);
+                            let third = list.remove(0);
+                            ExprS::MultS{
+                                l : Box::new(parse_sexp(second)),
+                                r : Box::new(parse_sexp(third))
+                            }
+                        }
+                        "-" => {
+                            let second = list.remove(0);
+                            let third = list.remove(0);
+                            ExprS::MinusS{
+                                l : Box::new(parse_sexp(second)),
+                                r : Box::new(parse_sexp(third))
+                            }
+                        }
+                        _ => panic!("Not implemented yet")
+                    }
+                }
+                _ => panic!("Not valid arithmetic!")
+            }
+        }
+    }
+}
 
+fn build_sexp(tokens : &mut Vec<String>) -> Sexp {
     if tokens.len() == 0 {
         panic!("Syntax error: Unexpected EOF while parsing!");
     } 
@@ -31,17 +87,25 @@ fn build_exp(mut tokens : Vec<String>) -> ExprS {
     let token : String = tokens.remove(0);
     let token_str : &str = token.as_str();
     match token_str {
+        "(" => {
+            let mut v : Vec<Sexp> = Vec::new();
+            while tokens[0] != ")" {
+                v.push(build_sexp(tokens));
+            }
+            tokens.remove(0);
+            Sexp::List(Box::new(v))
+        }
         _ => atomic(token_str),
     }
 }
 
-fn atomic(s : &str) -> ExprS {
+fn atomic(s : &str) -> Sexp {
     if let Some(n) = is_number(s) {
-        ExprS::NumS(n)
+        Sexp::Num(n)
     } else if let Some(b) = is_bool(s) {
-        ExprS::BoolS(b)
+        Sexp::Bool(b)
     } else {
-        ExprS::IdS(s.to_string())
+        Sexp::Sym(s.to_string())
     }
 }
 
@@ -53,4 +117,19 @@ fn tokenize(s: &str) -> Vec<String> {
         .collect();
     v.retain(|i| !i.is_empty());
     return v;
+}
+
+
+
+impl fmt::Display for Sexp {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            Sexp::Num(n) => write!(f, "{}", n),
+            Sexp::Bool(b) => write!(f, "{}", b),
+            Sexp::Sym(ref s) => write!(f, "{}", s),
+            Sexp::List(ref v) =>{
+                write!(f, "[ {:?} ]", v)
+            }
+        }
+    }
 }
