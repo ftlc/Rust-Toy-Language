@@ -8,7 +8,7 @@ enum Sexp {
     Bool (bool),
     Num (i32),
     Sym (String),
-    List (Box<Vec<Sexp>>)
+    List (Vec<Sexp>)
 }
 
 pub fn parse(s : &str) -> ExprS {
@@ -17,7 +17,7 @@ pub fn parse(s : &str) -> ExprS {
     let s : Sexp = build_sexp(&mut tokens);
     println!("SEXPL {}", s);
 
-    parse_sexp(s)
+    parse_sexp(&s)
 }
 
 
@@ -35,41 +35,41 @@ fn is_bool(s: &str) -> Option<bool> {
     }
 }
 
-fn parse_sexp(sexp : Sexp) -> ExprS {
-    match sexp {
+fn parse_sexp(sexp : &Sexp) -> ExprS {
+    match *sexp {
         Sexp::Num(n) => ExprS::NumS(n),
         Sexp::Bool(b) => ExprS::BoolS(b),
-        Sexp::Sym(s) => ExprS::IdS(s),
-        Sexp::List(v) => {
-            let mut list = *v;
-            let first = list.remove(0); //Gross
-            match first {
-                Sexp::Sym(s) => {
+        Sexp::Sym(ref s) => ExprS::IdS(s.clone()),
+        Sexp::List(ref list) => {
+            let first = &list[0]; //Gross
+            match *first {
+                Sexp::Sym(ref s) => {
                     match s.as_ref() {
                         "+" => {
-                            let second = list.remove(0); 
-                            let third = list.remove(0); //Grosser
+                            let second = &list[1];
+                            let third = &list[2];
                             ExprS::PlusS{
                                 l : Box::new(parse_sexp(second)),
                                 r : Box::new(parse_sexp(third))
                             }
                         }
                         "*" => {
-                            let second = list.remove(0);
-                            let third = list.remove(0);
+                            let second = &list[1];
+                            let third = &list[2];
                             ExprS::MultS{
                                 l : Box::new(parse_sexp(second)),
                                 r : Box::new(parse_sexp(third))
                             }
                         }
                         "-" => {
-                            let second = list.remove(0);
-                            let third = list.remove(0);
+                            let second = &list[1];
+                            let third = &list[2];
                             ExprS::MinusS{
                                 l : Box::new(parse_sexp(second)),
                                 r : Box::new(parse_sexp(third))
                             }
                         }
+
                         _ => panic!("Not implemented yet")
                     }
                 }
@@ -93,7 +93,7 @@ fn build_sexp(tokens : &mut Vec<String>) -> Sexp {
                 v.push(build_sexp(tokens));
             }
             tokens.remove(0);
-            Sexp::List(Box::new(v))
+            Sexp::List(v)
         }
         _ => atomic(token_str),
     }
