@@ -35,6 +35,9 @@ fn is_bool(s: &str) -> Option<bool> {
     }
 }
 
+fn fourth<T>(v : &Vec<T>) -> &T {
+    &((&v)[3])
+}
 fn third<T>(v : &Vec<T>) -> &T {
     &((&v)[2])
 }
@@ -63,6 +66,11 @@ fn parse_sexp(sexp : &Sexp) -> ExprS {
                         "-" => ExprS::MinusS{
                             l : Box::new(parse_sexp(second(list))),
                             r : Box::new(parse_sexp(third(list)))
+                        },
+                        "if" => ExprS::IfS{
+                            c : Box::new(parse_sexp(second(list))),
+                            t : Box::new(parse_sexp(third(list))),
+                            e : Box::new(parse_sexp(fourth(list)))
                         },
 
                         _ => panic!("Not implemented yet")

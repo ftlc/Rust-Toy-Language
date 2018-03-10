@@ -11,6 +11,7 @@ enum ExprC {
     IdC (String),
     PlusC {l: Box<ExprC>, r: Box<ExprC>},
     MultC {l: Box<ExprC>, r: Box<ExprC>},
+    IfC {c: Box<ExprC>, t: Box<ExprC>, e: Box<ExprC>},
 }
 
 
@@ -41,8 +42,16 @@ fn desugar(expr_s : ExprS ) ->ExprC {
                     })
             }
         }
+        ExprS::IfS { c, t, e } => {
+            ExprC::IfC { 
+                c: Box::new(desugar(*c)),
+                t: Box::new(desugar(*t)),
+                e: Box::new(desugar(*e))
+            }
+        }
     }
 }
+
 fn interp(expr_c : ExprC) -> Value {
     match expr_c {
         ExprC::BoolC(b) => Value::BoolV(b),
@@ -57,7 +66,23 @@ fn interp(expr_c : ExprC) -> Value {
             let r_n = interp(*r);
             return num_mult(l_n, r_n);
         },
+        ExprC::IfC {c, t, e} => {
+            if_imp(*c, *t, *e)
+        }
         _ => panic!("Not implemented")
+    }
+}
+
+
+fn if_imp(c: ExprC, t: ExprC, e: ExprC) -> Value {
+    if let Value::BoolV(cond) = interp(c) {
+        if cond {
+            interp(t)
+        } else {
+            interp(e)
+        }
+    } else {
+        panic!("Conditional is not a bool!")
     }
 }
 

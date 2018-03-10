@@ -14,6 +14,7 @@ pub enum ExprS {
     PlusS {l: Box<ExprS>, r: Box<ExprS>},
     MultS {l: Box<ExprS>, r: Box<ExprS>}, 
     MinusS {l: Box<ExprS>, r: Box<ExprS>}, 
+    IfS {c: Box<ExprS>, t: Box<ExprS>, e: Box<ExprS>}, 
 }
 
 

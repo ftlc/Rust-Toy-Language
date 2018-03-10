@@ -26,3 +26,7 @@ fn tests_minus() {
     assert_eq!(Value::NumV(5), pl::run("(- (+ 8 2) 5)"));
 }
 
+#[test]
+fn tests_if() {
+    assert_eq!(Value::NumV(5), pl::run("(if true 5 10)"));
+}
